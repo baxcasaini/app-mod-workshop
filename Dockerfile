@@ -1,4 +1,3 @@
-
 # Use the official PHP image: https://hub.docker.com/_/php
 FROM php:5.6-apache
 
@@ -6,7 +5,6 @@ FROM php:5.6-apache
 # Precompile PHP code with opcache.
 # Install PHP's extension for MySQL
 RUN docker-php-ext-install -j "$(nproc)" opcache mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql
-
 RUN set -ex; \
   { \
     echo "; Cloud Run enforces memory & timeouts"; \
@@ -22,9 +20,14 @@ RUN set -ex; \
     echo "opcache.memory_consumption = 32"; \
   } > "$PHP_INI_DIR/conf.d/cloud-run.ini"
 
+# Define environment variables for database connection
+ENV DB_HOST="34.31.66.153"
+ENV DB_NAME="image_catalog"
+ENV DB_USER="appmod-phpapp-user"
+ENV DB_PASS="CLOUDSQL_INSTANCE_PASSWORD"
+
 # Copy in custom code from the host machine.
 WORKDIR /var/www/html
-
 COPY . .
 
 # Setup the PORT environment variable in Apache configuration files: https://cloud.google.com/run/docs/reference/container-contract#port
